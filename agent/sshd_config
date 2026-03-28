@@ -1,0 +1,35 @@
+# SSH Server Configuration for OpenCode Agent
+
+# Basic settings
+Port 22
+Protocol 2
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Authentication
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+
+# Only allow opencode user
+AllowUsers opencode
+
+# Security
+X11Forwarding no
+PrintMotd yes
+TCPKeepAlive yes
+ClientAliveInterval 60
+ClientAliveCountMax 3
+
+# Allow agent forwarding for git operations
+AllowAgentForwarding yes
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Subsystem
+Subsystem sftp /usr/lib/openssh/sftp-server

@@ -1,0 +1,7 @@
+# Agent routing configuration (template - will be replaced by entrypoint.sh)
+
+Host agent-*
+    User opencode
+    Port 22
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null

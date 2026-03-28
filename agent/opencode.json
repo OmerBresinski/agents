@@ -1,0 +1,8 @@
+{
+  "provider": {
+    "bedrock": {
+      "aws_region": "${AWS_REGION:-us-east-1}"
+    }
+  },
+  "model": "amazon-bedrock/anthropic.claude-sonnet-4-20250514-v1:0"
+}

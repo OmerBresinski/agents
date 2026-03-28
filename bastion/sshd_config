@@ -1,0 +1,34 @@
+# Bastion SSH Server Configuration
+
+Port 22
+Protocol 2
+
+# Authentication
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+
+# Only allow opencode user
+AllowUsers opencode
+
+# Enable TCP forwarding for jump host functionality
+AllowTcpForwarding yes
+GatewayPorts no
+X11Forwarding no
+
+# Allow agent forwarding
+AllowAgentForwarding yes
+
+# Keep connections alive
+TCPKeepAlive yes
+ClientAliveInterval 60
+ClientAliveCountMax 3
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Subsystem
+Subsystem sftp /usr/lib/ssh/sftp-server
