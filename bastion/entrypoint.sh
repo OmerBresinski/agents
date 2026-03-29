@@ -7,8 +7,12 @@ if [ -n "$SSH_AUTHORIZED_KEYS" ]; then
     chmod 600 /home/opencode/.ssh/authorized_keys
     chown opencode:opencode /home/opencode/.ssh/authorized_keys
     echo "SSH authorized keys configured"
-else
-    echo "Warning: SSH_AUTHORIZED_KEYS not set. SSH access will not work."
+fi
+
+# Setup SSH password for multi-device access
+if [ -n "${SSH_PASSWORD:-}" ]; then
+    echo "opencode:$SSH_PASSWORD" | chpasswd
+    echo "SSH password authentication configured"
 fi
 
 # Generate SSH host keys if they don't exist

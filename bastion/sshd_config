@@ -6,7 +6,7 @@ Protocol 2
 # Authentication
 PermitRootLogin no
 PubkeyAuthentication yes
-PasswordAuthentication no
+PasswordAuthentication yes
 PermitEmptyPasswords no
 ChallengeResponseAuthentication no
 

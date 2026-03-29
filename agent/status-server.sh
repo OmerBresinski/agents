@@ -129,20 +129,28 @@ get_session_info() {
     local old_fingerprint=""
     [ -f "$FINGERPRINT_FILE" ] && old_fingerprint=$(cat "$FINGERPRINT_FILE")
 
-    # If fingerprint hasn't changed and cache exists, return cache (skip expensive export)
+    # If fingerprint hasn't changed and cache exists with non-zero cost, return cache
     if [ "$fingerprint" = "$old_fingerprint" ] && [ -f "$CACHE_FILE" ]; then
-        # Update the duration field since time has passed
-        local cached
-        cached=$(cat "$CACHE_FILE")
-        echo "$cached"
-        return
+        local cached_cost
+        cached_cost=$(jq -r '.cost // 0' "$CACHE_FILE" 2>/dev/null)
+        if [ "$cached_cost" != "0" ] && [ -n "$cached_cost" ]; then
+            cat "$CACHE_FILE"
+            return
+        fi
+        # Cache has cost 0, re-export to try getting real data
     fi
 
-    # Export the session data and parse it directly (pipe to avoid shell variable truncation)
-    local EXPORT_FILE="/tmp/.opencode-export-$$.json"
-    sudo -u opencode opencode export "$session_id" 2>/dev/null | grep -v "^Exporting session:" > "$EXPORT_FILE"
+    # Export the session data directly to file (no pipes to avoid buffer truncation)
+    local EXPORT_FILE="/tmp/.opencode-export-$(date +%s%N).json"
+    sudo -u opencode opencode export "$session_id" > "$EXPORT_FILE" 2>/dev/null
+
+    # Strip the "Exporting session:" line if present (it's the first line, before JSON)
+    if head -1 "$EXPORT_FILE" 2>/dev/null | grep -q "^Exporting"; then
+        tail -n +2 "$EXPORT_FILE" > "${EXPORT_FILE}.tmp" && mv "${EXPORT_FILE}.tmp" "$EXPORT_FILE"
+    fi
 
     if [ ! -s "$EXPORT_FILE" ] || ! jq empty "$EXPORT_FILE" 2>/dev/null; then
+        echo "export failed: size=$(wc -c < "$EXPORT_FILE" 2>/dev/null), head=$(head -c 100 "$EXPORT_FILE" 2>/dev/null)" >> /tmp/.opencode-debug.log
         rm -f "$EXPORT_FILE"
         # Export failed -- return cache if available
         if [ -f "$CACHE_FILE" ]; then

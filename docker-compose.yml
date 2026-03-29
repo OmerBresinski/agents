@@ -41,6 +41,7 @@ services:
       - "2222:22"
     environment:
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
+      SSH_PASSWORD: "${SSH_PASSWORD:-}"
       AGENT_1_HOST: agent-1
       AGENT_2_HOST: agent-2
       AGENT_3_HOST: agent-3
@@ -95,6 +96,7 @@ services:
     environment:
       AGENT_ID: agent-1
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
+      SSH_PASSWORD: "${SSH_PASSWORD:-}"
       AWS_BEARER_TOKEN_BEDROCK: "${AWS_BEARER_TOKEN_BEDROCK}"
       AWS_REGION: "${AWS_REGION:-us-east-1}"
       BUCKET_ENDPOINT: "http://minio:9000"
@@ -117,6 +119,7 @@ services:
     environment:
       AGENT_ID: agent-2
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
+      SSH_PASSWORD: "${SSH_PASSWORD:-}"
       AWS_BEARER_TOKEN_BEDROCK: "${AWS_BEARER_TOKEN_BEDROCK}"
       AWS_REGION: "${AWS_REGION:-us-east-1}"
       BUCKET_ENDPOINT: "http://minio:9000"
@@ -139,6 +142,7 @@ services:
     environment:
       AGENT_ID: agent-3
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
+      SSH_PASSWORD: "${SSH_PASSWORD:-}"
       AWS_BEARER_TOKEN_BEDROCK: "${AWS_BEARER_TOKEN_BEDROCK}"
       AWS_REGION: "${AWS_REGION:-us-east-1}"
       BUCKET_ENDPOINT: "http://minio:9000"
@@ -161,6 +165,7 @@ services:
     environment:
       AGENT_ID: agent-4
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
+      SSH_PASSWORD: "${SSH_PASSWORD:-}"
       AWS_BEARER_TOKEN_BEDROCK: "${AWS_BEARER_TOKEN_BEDROCK}"
       AWS_REGION: "${AWS_REGION:-us-east-1}"
       BUCKET_ENDPOINT: "http://minio:9000"
@@ -183,6 +188,7 @@ services:
     environment:
       AGENT_ID: agent-5
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
+      SSH_PASSWORD: "${SSH_PASSWORD:-}"
       AWS_BEARER_TOKEN_BEDROCK: "${AWS_BEARER_TOKEN_BEDROCK}"
       AWS_REGION: "${AWS_REGION:-us-east-1}"
       BUCKET_ENDPOINT: "http://minio:9000"
