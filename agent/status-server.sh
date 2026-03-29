@@ -1,6 +1,9 @@
 #!/bin/bash
 # Lightweight HTTP status server for OpenCode agent
-# Responds to GET requests on port 8080 with agent status JSON
+# Responds to GET requests on port 9090 with agent status JSON
+
+# Ensure full PATH is available (socat exec has minimal env)
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
 PORT=${STATUS_PORT:-9090}
 AGENT_ID=${AGENT_ID:-"agent-unknown"}
@@ -137,7 +140,7 @@ get_session_info() {
 
     # Export the session data and parse it directly (pipe to avoid shell variable truncation)
     local EXPORT_FILE="/tmp/.opencode-export-$$.json"
-    sudo -u opencode opencode export "$session_id" 2>/dev/null | sed '1{/^Exporting/d}' > "$EXPORT_FILE"
+    sudo -u opencode opencode export "$session_id" 2>/dev/null | grep -v "^Exporting session:" > "$EXPORT_FILE"
 
     if [ ! -s "$EXPORT_FILE" ] || ! jq empty "$EXPORT_FILE" 2>/dev/null; then
         rm -f "$EXPORT_FILE"
