@@ -23,8 +23,6 @@ const queryClient = new QueryClient({
   },
 });
 
-const BASTION_HOST = import.meta.env.VITE_BASTION_HOST || 'bastion.railway.app';
-
 function useThemeToggle() {
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -75,7 +73,6 @@ function Layout() {
         onToggleTheme={toggleTheme}
       />
       <SidebarInset className="flex h-screen min-h-0 flex-col">
-        {/* Dashboard is always mounted, toggled via CSS to avoid expensive re-mount */}
         <div className={isDashboard ? 'flex min-h-0 flex-1 flex-col' : 'hidden'}>
           <DashboardPage />
         </div>
@@ -137,7 +134,6 @@ function AgentsPage() {
           {selectedAgent ? (
             <AgentDetail
               agent={selectedAgent}
-              bastionHost={BASTION_HOST}
               recentSessions={sessions ?? []}
             />
           ) : (
@@ -157,7 +153,7 @@ function HistoryPage() {
 }
 
 function GuidePage() {
-  return <QuickStartPage bastionHost={BASTION_HOST} />;
+  return <QuickStartPage />;
 }
 
 export function App() {
