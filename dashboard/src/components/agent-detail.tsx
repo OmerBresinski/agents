@@ -4,14 +4,6 @@ import { Copy01Icon } from '@hugeicons/core-free-icons';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { formatCost } from '@/lib/format';
 import type { Agent, SessionHistoryItem } from '@/types/agent';
 
@@ -44,79 +36,91 @@ export function AgentDetail({ agent, recentSessions }: AgentDetailProps) {
   ];
 
   return (
-    <ScrollArea className="h-full bg-card">
-      <div className="flex flex-col">
-        {/* ── Metrics (4 cells) ────────────────────────────────── */}
-        <div className="grid grid-cols-4 border-b border-border">
-          {metrics.map((metric, i) => (
-            <div
-              key={metric.label}
-              className={`flex h-[200px] flex-col justify-center gap-2 pb-8 pl-16 pr-8 pt-8 ${i > 0 ? 'border-l border-border' : ''}`}
-            >
-              <span className="text-[11px] text-muted-foreground">{metric.label}</span>
-              <div className="font-heading text-[42px] font-normal leading-tight">
-                {metric.numericValue !== undefined ? (
-                  <AnimateNumber
-                    transition={springTransition}
-                    prefix={metric.isCurrency ? '$' : undefined}
-                    suffix={metric.suffix}
-                    format={
-                      metric.isCurrency
-                        ? { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-                        : undefined
-                    }
-                  >
-                    {metric.numericValue}
-                  </AnimateNumber>
-                ) : (
-                  <span>{metric.textValue}</span>
-                )}
-              </div>
-              {metric.showProgress && <Progress value={agent.resources.cpu} />}
+    <div className="flex h-full flex-col bg-card">
+      {/* ── Metrics (fixed at top) ───────────────────────────── */}
+      <div className="grid shrink-0 grid-cols-4 border-b border-border">
+        {metrics.map((metric, i) => (
+          <div
+            key={metric.label}
+            className={`flex h-[200px] flex-col justify-center gap-2 pb-8 pl-16 pr-8 pt-8 ${i > 0 ? 'border-l border-border' : ''}`}
+          >
+            <span className="text-[11px] text-muted-foreground">{metric.label}</span>
+            <div className="font-heading text-[42px] font-normal leading-tight">
+              {metric.numericValue !== undefined ? (
+                <AnimateNumber
+                  transition={springTransition}
+                  prefix={metric.isCurrency ? '$' : undefined}
+                  suffix={metric.suffix}
+                  format={
+                    metric.isCurrency
+                      ? { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                      : undefined
+                  }
+                >
+                  {metric.numericValue}
+                </AnimateNumber>
+              ) : (
+                <span>{metric.textValue}</span>
+              )}
             </div>
-          ))}
-        </div>
+            {metric.showProgress && <Progress value={agent.resources.cpu} />}
+          </div>
+        ))}
+      </div>
 
-        {/* ── Recent Sessions ──────────────────────────────────── */}
-        <div className="flex-1 px-8 pb-8 pl-16 pt-8">
+      {/* ── Recent Sessions ──────────────────────────────────── */}
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="shrink-0 px-8 pl-16 pt-8">
           <span className="text-[0.6875rem] font-medium uppercase tracking-widest text-muted-foreground">
             Recent Sessions
           </span>
-          {agentSessions.length > 0 ? (
-            <div className="mt-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[48px]" />
-                    <TableHead className="text-sm">Session</TableHead>
-                    <TableHead className="w-[120px] text-sm">Duration</TableHead>
-                    <TableHead className="w-[120px] text-sm">Cost</TableHead>
-                    <TableHead className="w-[120px] text-right text-sm">When</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {agentSessions.map((session) => (
-                    <TableRow key={session.id} className="h-14">
-                      <TableCell>
-                        <CopySessionButton sessionId={session.id} />
-                      </TableCell>
-                      <TableCell className="text-sm font-medium">{session.title}</TableCell>
-                      <TableCell className="text-sm">{session.duration}</TableCell>
-                      <TableCell className="text-sm">{formatCost(session.cost)}</TableCell>
-                      <TableCell className="text-right text-sm text-muted-foreground">
-                        {session.completedAt}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <p className="mt-3 text-sm text-muted-foreground">No previous sessions</p>
-          )}
         </div>
+        {agentSessions.length > 0 ? (
+          <>
+            {/* Fixed header */}
+            <div className="shrink-0 border-b border-border px-8 pl-16 pt-4">
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="w-[48px] pb-3" />
+                    <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Session</th>
+                    <th className="w-[120px] pb-3 text-left text-sm font-medium text-muted-foreground">Duration</th>
+                    <th className="w-[120px] pb-3 text-left text-sm font-medium text-muted-foreground">Cost</th>
+                    <th className="w-[120px] pb-3 text-right text-sm font-medium text-muted-foreground">When</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            {/* Scrollable body */}
+            <ScrollArea className="min-h-0 flex-1">
+              <div className="px-8 pb-8 pl-16">
+                <table className="w-full">
+                  <tbody>
+                    {agentSessions.map((session) => (
+                      <tr key={session.id} className="h-14 border-b border-border last:border-0">
+                        <td className="w-[48px]">
+                          <CopySessionButton sessionId={session.id} />
+                        </td>
+                        <td className="text-sm font-medium">{session.title}</td>
+                        <td className="w-[120px] text-sm">{session.duration}</td>
+                        <td className="w-[120px] text-sm">{formatCost(session.cost)}</td>
+                        <td className="w-[120px] text-right text-sm text-muted-foreground">
+                          {session.completedAt}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </ScrollArea>
+          </>
+        ) : (
+          <p className="px-8 pb-8 pl-16 pt-4 text-sm text-muted-foreground">
+            No previous sessions
+          </p>
+        )}
       </div>
-    </ScrollArea>
+    </div>
   );
 }
 
