@@ -375,9 +375,15 @@ read -rp "  Press Enter when done... "
 
 # Fetch TCP proxy info
 info "Detecting TCP proxy..."
-BASTION_SERVICE_ID=$(railway environment config --json 2>/dev/null | jq -r '.services | to_entries[] | select(.value.source.rootDirectory == "/bastion" or .key == "bastion") | .key' 2>/dev/null | head -1)
 
-# Try via the railway CLI
+# Get bastion service ID from the project services
+BASTION_SERVICE_ID=""
+ALL_SERVICES=$(railway service status --all --json 2>/dev/null)
+if [ -n "$ALL_SERVICES" ]; then
+    BASTION_SERVICE_ID=$(echo "$ALL_SERVICES" | jq -r '.[] | select(.name == "bastion") | .id // empty' 2>/dev/null)
+fi
+
+# Try via the Railway CLI
 railway service link bastion 2>/dev/null
 TCP_INFO=""
 
@@ -385,7 +391,7 @@ TCP_INFO=""
 for attempt in $(seq 1 6); do
     # Try to get it from the Railway API
     if [ -n "$BASTION_SERVICE_ID" ] && [ -n "$ENV_ID" ]; then
-        RAILWAY_TOKEN=$(cat ~/.railway/config.json 2>/dev/null | jq -r '.token // empty' || echo "")
+        RAILWAY_TOKEN=$(cat ~/.railway/config.json 2>/dev/null | jq -r '.user.token // .token // empty' || echo "")
         if [ -n "$RAILWAY_TOKEN" ]; then
             TCP_RESULT=$(gql "$RAILWAY_TOKEN" 'query($sid: String!, $eid: String!) { tcpProxies(serviceId: $sid, environmentId: $eid) { domain proxyPort } }' "{\"sid\":\"$BASTION_SERVICE_ID\",\"eid\":\"$ENV_ID\"}" 2>/dev/null)
             TCP_DOMAIN=$(echo "$TCP_RESULT" | jq -r '.data.tcpProxies[0].domain // empty' 2>/dev/null)
