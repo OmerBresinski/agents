@@ -12,10 +12,16 @@ RUN apt-get update && apt-get install -y \
     sudo \
     socat \
     findutils \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install OpenCode globally
 RUN npm install -g opencode-ai
+
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash \
+    && ln -s /root/.bun/bin/bun /usr/local/bin/bun \
+    && ln -s /root/.bun/bin/bunx /usr/local/bin/bunx
 
 # Install s5cmd for S3-compatible workspace sync (Railway Bucket)
 RUN curl -sSL -o /tmp/s5cmd.deb https://github.com/peak/s5cmd/releases/download/v2.3.0/s5cmd_2.3.0_linux_amd64.deb \
@@ -25,7 +31,11 @@ RUN curl -sSL -o /tmp/s5cmd.deb https://github.com/peak/s5cmd/releases/download/
 # Create opencode user with sudo access (set dummy password to unlock for SSH)
 RUN useradd -m -s /bin/bash opencode \
     && echo "opencode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
-    && echo "opencode:*" | chpasswd -e
+    && echo "opencode:*" | chpasswd -e \
+    && mkdir -p /home/opencode/.bun/bin \
+    && cp /root/.bun/bin/bun /home/opencode/.bun/bin/bun \
+    && ln -s /home/opencode/.bun/bin/bun /home/opencode/.bun/bin/bunx \
+    && chown -R opencode:opencode /home/opencode/.bun
 
 # Setup SSH
 RUN mkdir /var/run/sshd \
