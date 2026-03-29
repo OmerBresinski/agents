@@ -82,6 +82,7 @@ interface AgentStatus {
   status: 'idle' | 'active' | 'busy' | 'offline';
   repo: string | null;
   session: {
+    id: string | null;
     title: string | null;
     duration: string | null;
     messageCount: number;
@@ -206,6 +207,7 @@ async function fetchAgentStatus(
       status: 'offline',
       repo: null,
       session: {
+        id: null,
         title: null,
         duration: null,
         messageCount: 0,
@@ -244,7 +246,7 @@ async function fetchAllAgentStatuses(): Promise<AgentStatus[]> {
       if (!existingSession) {
         // New active session
         sessionHistory.unshift({
-          id: `${status.id}-${Date.now()}`,
+          id: status.session.id || `${status.id}-${Date.now()}`,
           agentId: status.id,
           title: status.session.title,
           duration: status.session.duration || '0m',
@@ -414,12 +416,20 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (pathname === '/api/health') {
+    // Parse bastion host from VITE_BASTION_HOST (format: "hostname:port")
+    const bastionHostEnv = process.env.VITE_BASTION_HOST || '';
+    const [bastionHost, bastionPortStr] = bastionHostEnv.split(':');
+    const bastionPort = parseInt(bastionPortStr, 10) || 0;
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(
       JSON.stringify({
         status: 'ok',
         timestamp: new Date().toISOString(),
         bucketEnabled: !!bucketConfigured,
+        bastion: bastionHost
+          ? { host: bastionHost, port: bastionPort, user: 'opencode' }
+          : undefined,
       })
     );
     return;

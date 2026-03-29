@@ -29,7 +29,7 @@ export function SessionHistoryPage({ sessions }: SessionHistoryPageProps) {
         />
 
         {/* Table */}
-        <div className="px-6 py-5">
+        <div className="px-8 py-8">
           {!sessions || sessions.length === 0 ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
               No sessions recorded yet.
@@ -38,27 +38,27 @@ export function SessionHistoryPage({ sessions }: SessionHistoryPageProps) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40px]" />
-                  <TableHead className="w-[120px]">Agent</TableHead>
-                  <TableHead>Session</TableHead>
-                  <TableHead className="w-[100px]">Duration</TableHead>
-                  <TableHead className="w-[100px]">Cost</TableHead>
-                  <TableHead className="w-[100px] text-right">When</TableHead>
+                  <TableHead className="w-[48px]" />
+                  <TableHead className="w-[140px] text-sm">Agent</TableHead>
+                  <TableHead className="text-sm">Session</TableHead>
+                  <TableHead className="w-[120px] text-sm">Duration</TableHead>
+                  <TableHead className="w-[120px] text-sm">Cost</TableHead>
+                  <TableHead className="w-[120px] text-right text-sm">When</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sessions.map((session) => (
-                  <TableRow key={session.id}>
+                  <TableRow key={session.id} className="h-14">
                     <TableCell>
                       <CopySessionButton sessionId={session.id} />
                     </TableCell>
-                    <TableCell className="font-medium">
+                    <TableCell className="text-sm font-medium">
                       {titleCase(session.agentId)}
                     </TableCell>
-                    <TableCell>{session.title}</TableCell>
-                    <TableCell>{session.duration}</TableCell>
-                    <TableCell>{formatCost(session.cost)}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">
+                    <TableCell className="text-sm">{session.title}</TableCell>
+                    <TableCell className="text-sm">{session.duration}</TableCell>
+                    <TableCell className="text-sm">{formatCost(session.cost)}</TableCell>
+                    <TableCell className="text-right text-sm text-muted-foreground">
                       {session.completedAt}
                     </TableCell>
                   </TableRow>

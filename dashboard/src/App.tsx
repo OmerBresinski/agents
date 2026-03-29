@@ -163,7 +163,7 @@ export function App() {
         <BrowserRouter>
           <Layout />
         </BrowserRouter>
-        <Toaster position="top-center" />
+        <Toaster position="bottom-right" />
       </TooltipProvider>
     </QueryClientProvider>
   );

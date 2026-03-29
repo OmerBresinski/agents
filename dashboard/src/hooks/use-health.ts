@@ -49,8 +49,8 @@ export function useHealth() {
 export function useBastionConfig(): BastionConfig {
   const { data } = useHealth();
   return data?.bastion ?? {
-    host: 'bastion.railway.app',
-    port: 22,
+    host: 'not-configured',
+    port: 0,
     user: 'opencode',
   };
 }

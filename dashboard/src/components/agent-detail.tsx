@@ -78,32 +78,32 @@ export function AgentDetail({ agent, recentSessions }: AgentDetailProps) {
         </div>
 
         {/* ── Recent Sessions ──────────────────────────────────── */}
-        <div className="flex-1 pb-8 pl-16 pr-8 pt-8">
+        <div className="flex-1 px-8 pb-8 pl-16 pt-8">
           <span className="text-[0.6875rem] font-medium uppercase tracking-widest text-muted-foreground">
             Recent Sessions
           </span>
           {agentSessions.length > 0 ? (
-            <div className="mt-3">
+            <div className="mt-4">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[40px]" />
-                    <TableHead>Session</TableHead>
-                    <TableHead className="w-[100px]">Duration</TableHead>
-                    <TableHead className="w-[100px]">Cost</TableHead>
-                    <TableHead className="w-[100px] text-right">When</TableHead>
+                    <TableHead className="w-[48px]" />
+                    <TableHead className="text-sm">Session</TableHead>
+                    <TableHead className="w-[120px] text-sm">Duration</TableHead>
+                    <TableHead className="w-[120px] text-sm">Cost</TableHead>
+                    <TableHead className="w-[120px] text-right text-sm">When</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {agentSessions.map((session) => (
-                    <TableRow key={session.id}>
+                    <TableRow key={session.id} className="h-14">
                       <TableCell>
                         <CopySessionButton sessionId={session.id} />
                       </TableCell>
-                      <TableCell className="font-medium">{session.title}</TableCell>
-                      <TableCell>{session.duration}</TableCell>
-                      <TableCell>{formatCost(session.cost)}</TableCell>
-                      <TableCell className="text-right text-muted-foreground">
+                      <TableCell className="text-sm font-medium">{session.title}</TableCell>
+                      <TableCell className="text-sm">{session.duration}</TableCell>
+                      <TableCell className="text-sm">{formatCost(session.cost)}</TableCell>
+                      <TableCell className="text-right text-sm text-muted-foreground">
                         {session.completedAt}
                       </TableCell>
                     </TableRow>

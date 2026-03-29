@@ -95,6 +95,7 @@ get_session_info() {
     local CACHE_FILE="/tmp/.opencode-session-cache.json"
     local FINGERPRINT_FILE="/tmp/.opencode-session-fingerprint"
     local DEFAULT_RESPONSE='{
+    "id": null,
     "title": null,
     "duration": null,
     "messageCount": 0,
@@ -230,6 +231,7 @@ get_session_info() {
     local result
     result=$(cat << EOF
 {
+    "id": "$session_id",
     "title": $([ "$session_title" = "null" ] && echo "null" || echo "\"$session_title\""),
     "duration": $([ "$session_duration" = "null" ] && echo "null" || echo "\"$session_duration\""),
     "messageCount": $message_count,
