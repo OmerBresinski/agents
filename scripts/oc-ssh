@@ -1,0 +1,14 @@
+#!/bin/bash
+# Wrapper for SSH to agent containers that resets terminal after disconnect
+# Usage: oc-ssh agent-1
+
+if [ -z "$1" ]; then
+    echo "Usage: oc-ssh <agent-name>"
+    echo "  e.g. oc-ssh agent-1"
+    exit 1
+fi
+
+ssh "$@"
+# Reset terminal after SSH ends (cleans up leftover ANSI escape codes)
+printf '\033[0m\033[?25h\033[?1049l' 2>/dev/null
+stty sane 2>/dev/null

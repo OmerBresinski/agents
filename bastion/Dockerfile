@@ -5,8 +5,9 @@ FROM alpine:3.19
 # Install OpenSSH
 RUN apk add --no-cache openssh bash curl
 
-# Create opencode user
-RUN adduser -D -s /bin/bash opencode
+# Create opencode user (unlock account for SSH access)
+RUN adduser -D -s /bin/bash opencode \
+    && passwd -u opencode
 
 # Setup SSH directories
 RUN mkdir -p /home/opencode/.ssh \

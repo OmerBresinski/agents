@@ -11,14 +11,21 @@ RUN apt-get update && apt-get install -y \
     jq \
     sudo \
     socat \
+    findutils \
     && rm -rf /var/lib/apt/lists/*
 
 # Install OpenCode globally
 RUN npm install -g opencode-ai
 
-# Create opencode user with sudo access
+# Install s5cmd for S3-compatible workspace sync (Railway Bucket)
+RUN curl -sSL -o /tmp/s5cmd.deb https://github.com/peak/s5cmd/releases/download/v2.3.0/s5cmd_2.3.0_linux_amd64.deb \
+    && dpkg -i /tmp/s5cmd.deb \
+    && rm /tmp/s5cmd.deb
+
+# Create opencode user with sudo access (set dummy password to unlock for SSH)
 RUN useradd -m -s /bin/bash opencode \
-    && echo "opencode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    && echo "opencode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+    && echo "opencode:*" | chpasswd -e
 
 # Setup SSH
 RUN mkdir /var/run/sshd \
@@ -41,12 +48,16 @@ RUN chown opencode:opencode /home/opencode/.opencode/config.json
 COPY status-server.sh /usr/local/bin/status-server
 RUN chmod +x /usr/local/bin/status-server
 
+# Copy workspace sync script
+COPY workspace-sync.sh /usr/local/bin/workspace-sync
+RUN chmod +x /usr/local/bin/workspace-sync
+
 # Copy entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Expose SSH and status server ports
-EXPOSE 22 8080
+EXPOSE 22 9090
 
 # Set working directory
 WORKDIR /workspace

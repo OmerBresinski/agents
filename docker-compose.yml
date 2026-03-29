@@ -2,6 +2,36 @@
 # Usage: docker compose up --build
 
 services:
+  # ── MinIO (S3-compatible bucket for local testing) ─────────
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - agent-network
+
+  # ── MinIO Init (create bucket on startup) ──────────────────
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 3;
+      mc alias set local http://minio:9000 minioadmin minioadmin;
+      mc mb local/opencode-storage --ignore-existing;
+      echo 'Bucket opencode-storage created';
+      "
+    networks:
+      - agent-network
+
   # ── Bastion (Jump Host) ──────────────────────────────────────
   bastion:
     build:
@@ -42,7 +72,13 @@ services:
       AGENT_STATUS_PORT: "8080"
       DASHBOARD_USER: admin
       DASHBOARD_PASSWORD: "${DASHBOARD_PASSWORD:-}"
+      BUCKET_ENDPOINT: "http://minio:9000"
+      BUCKET_ACCESS_KEY_ID: "minioadmin"
+      BUCKET_SECRET_ACCESS_KEY: "minioadmin"
+      BUCKET_NAME: "opencode-storage"
+      BUCKET_REGION: "us-east-1"
     depends_on:
+      - minio-init
       - agent-1
       - agent-2
       - agent-3
@@ -61,6 +97,13 @@ services:
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
       AWS_BEARER_TOKEN_BEDROCK: "${AWS_BEARER_TOKEN_BEDROCK}"
       AWS_REGION: "${AWS_REGION:-us-east-1}"
+      BUCKET_ENDPOINT: "http://minio:9000"
+      BUCKET_ACCESS_KEY_ID: "minioadmin"
+      BUCKET_SECRET_ACCESS_KEY: "minioadmin"
+      BUCKET_NAME: "opencode-storage"
+      BUCKET_REGION: "us-east-1"
+    depends_on:
+      - minio-init
     volumes:
       - agent-1-workspace:/workspace
     networks:
@@ -76,6 +119,13 @@ services:
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
       AWS_BEARER_TOKEN_BEDROCK: "${AWS_BEARER_TOKEN_BEDROCK}"
       AWS_REGION: "${AWS_REGION:-us-east-1}"
+      BUCKET_ENDPOINT: "http://minio:9000"
+      BUCKET_ACCESS_KEY_ID: "minioadmin"
+      BUCKET_SECRET_ACCESS_KEY: "minioadmin"
+      BUCKET_NAME: "opencode-storage"
+      BUCKET_REGION: "us-east-1"
+    depends_on:
+      - minio-init
     volumes:
       - agent-2-workspace:/workspace
     networks:
@@ -91,6 +141,13 @@ services:
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
       AWS_BEARER_TOKEN_BEDROCK: "${AWS_BEARER_TOKEN_BEDROCK}"
       AWS_REGION: "${AWS_REGION:-us-east-1}"
+      BUCKET_ENDPOINT: "http://minio:9000"
+      BUCKET_ACCESS_KEY_ID: "minioadmin"
+      BUCKET_SECRET_ACCESS_KEY: "minioadmin"
+      BUCKET_NAME: "opencode-storage"
+      BUCKET_REGION: "us-east-1"
+    depends_on:
+      - minio-init
     volumes:
       - agent-3-workspace:/workspace
     networks:
@@ -106,6 +163,13 @@ services:
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
       AWS_BEARER_TOKEN_BEDROCK: "${AWS_BEARER_TOKEN_BEDROCK}"
       AWS_REGION: "${AWS_REGION:-us-east-1}"
+      BUCKET_ENDPOINT: "http://minio:9000"
+      BUCKET_ACCESS_KEY_ID: "minioadmin"
+      BUCKET_SECRET_ACCESS_KEY: "minioadmin"
+      BUCKET_NAME: "opencode-storage"
+      BUCKET_REGION: "us-east-1"
+    depends_on:
+      - minio-init
     volumes:
       - agent-4-workspace:/workspace
     networks:
@@ -121,6 +185,13 @@ services:
       SSH_AUTHORIZED_KEYS: "${SSH_AUTHORIZED_KEYS}"
       AWS_BEARER_TOKEN_BEDROCK: "${AWS_BEARER_TOKEN_BEDROCK}"
       AWS_REGION: "${AWS_REGION:-us-east-1}"
+      BUCKET_ENDPOINT: "http://minio:9000"
+      BUCKET_ACCESS_KEY_ID: "minioadmin"
+      BUCKET_SECRET_ACCESS_KEY: "minioadmin"
+      BUCKET_NAME: "opencode-storage"
+      BUCKET_REGION: "us-east-1"
+    depends_on:
+      - minio-init
     volumes:
       - agent-5-workspace:/workspace
     networks:
@@ -128,6 +199,7 @@ services:
 
 # ── Volumes ──────────────────────────────────────────────────────
 volumes:
+  minio-data:
   agent-1-workspace:
   agent-2-workspace:
   agent-3-workspace:
